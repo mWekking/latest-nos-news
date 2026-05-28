@@ -4,10 +4,12 @@ import webbrowser
 import anthropic
 import feedparser
 import rumps
-from AppKit import NSWorkspace
+from AppKit import NSFont, NSFontAttributeName, NSWorkspace
+from Foundation import NSString
 
 RSS_URL = "https://feeds.nos.nl/nosnieuwsalgemeen"
 REFRESH_INTERVAL = 900
+MAX_TITLE_WIDTH = 300  # pixels
 
 
 class NosNewsApp(rumps.App):
@@ -50,9 +52,19 @@ class NosNewsApp(rumps.App):
                     ),
                 }],
             )
-            self.title = msg.content[0].text.strip()
+            self.title = self._fit(msg.content[0].text.strip())
         except Exception:
             self.title = self.title.removesuffix(" ↻")
+
+    def _fit(self, text):
+        font = NSFont.menuBarFontOfSize_(0)
+        attrs = {NSFontAttributeName: font}
+        while text:
+            width = NSString.stringWithString_(text).sizeWithAttributes_(attrs).width
+            if width <= MAX_TITLE_WIDTH:
+                return text
+            text = text.rsplit(" ", 1)[0]
+        return "NOS"
 
     def _on_wake_(self, notification):
         self._fetch()
