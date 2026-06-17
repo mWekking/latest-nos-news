@@ -1,6 +1,16 @@
 # Latest NOS News
 
-A macOS menu bar app that shows the latest NOS headline as an ultra-short (4–6 word) AI-generated summary. Clicking the summary opens the full article.
+A macOS menu bar app that shows the latest NOS headline (the first 6 words of the
+article title). Clicking it opens the full article.
+
+The headline is only shown while an external monitor is connected — the laptop's
+built-in display is too small for it. With only the built-in display, the app
+shows a short `NOS` placeholder instead.
+
+> **Note:** macOS does not let an app pin its menu bar item to a specific
+> display. When both displays are connected, the item appears on whichever
+> display currently has the active menu bar. The connect/disconnect of the
+> external monitor is what toggles whether the title is shown.
 
 ---
 
@@ -8,7 +18,6 @@ A macOS menu bar app that shows the latest NOS headline as an ultra-short (4–6
 
 - macOS
 - [UV](https://docs.astral.sh/uv/) package manager
-- `ANTHROPIC_API_KEY` environment variable set
 
 ---
 
@@ -40,11 +49,6 @@ Create `~/Library/LaunchAgents/com.markwekking.latest-nos-news.plist`:
         <string>/Users/mark.wekking/Documents/Claude projects/Latest-nos-news</string>
         <string>latest-nos-news</string>
     </array>
-    <key>EnvironmentVariables</key>
-    <dict>
-        <key>ANTHROPIC_API_KEY</key>
-        <string>YOUR_API_KEY_HERE</string>
-    </dict>
     <key>RunAtLoad</key>
     <true/>
     <key>KeepAlive</key>
