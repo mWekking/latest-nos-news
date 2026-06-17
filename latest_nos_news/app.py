@@ -1,4 +1,8 @@
 import datetime
+import fcntl
+import os
+import sys
+import tempfile
 import webbrowser
 
 import feedparser
@@ -85,7 +89,23 @@ class NosNewsApp(rumps.App):
             webbrowser.open(self._url)
 
 
+def _acquire_single_instance_lock():
+    # Hold an exclusive lock on a file for the process lifetime so a second
+    # launch fails fast instead of running a duplicate menu bar icon. The file
+    # handle is intentionally leaked: the OS releases the lock when the process
+    # exits.
+    lock_path = os.path.join(tempfile.gettempdir(), "latest-nos-news.lock")
+    handle = open(lock_path, "w")
+    try:
+        fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        print("Latest NOS News is already running.", file=sys.stderr)
+        sys.exit(0)
+    return handle
+
+
 def main():
+    _lock = _acquire_single_instance_lock()  # noqa: F841 — kept alive for process lifetime
     NosNewsApp().run()
 
 
